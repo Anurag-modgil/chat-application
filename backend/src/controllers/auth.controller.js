@@ -74,10 +74,10 @@ export const login = async (req,res)=>{
             }
             generateToken(user._id, res);
             return res.status(200).json({
-                __filenameid: user._id,
+                _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
-                profilePic : user.profilePic
+                profilePic: user.profilePic
             });
 
         }
@@ -111,18 +111,18 @@ export const logout = (req, res) => {
 };
 
 
-export const updateProfile = async (req,res) =>{
-    try{
-        const {profilePic} = req.body;
-        const userId = req.body._id;
+export const updateProfile = async (req, res) => {
+    try {
+        const { profilePic } = req.body;
+        const userId = req.user._id;
 
-        if(!profilePic){
-            return res.status(400).json({message:"Profile picture is required"})
+        if (!profilePic) {
+            return res.status(400).json({ message: "Profile picture is required" });
         }
         const uploadResponse = await cloudinary.uploader.upload(profilePic);
-        const updatedDB = await User.findOneAndUpdate(userId,{profilePic:uploadResponse.secure_url},{new:true});
+        const updatedDB = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
 
-        return res.status(200).json(updatedDB)
+        return res.status(200).json(updatedDB);
     }catch(error){
         console.log("Error occured in update profile method " +error.message );
         return res.status(500).json({message:error.message});
